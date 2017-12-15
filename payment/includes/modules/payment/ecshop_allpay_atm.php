@@ -35,7 +35,7 @@ if (isset($set_modules) && $set_modules == TRUE) {
     $modules[$i]['author'] = '歐付寶';
 
     /* 網址 */
-    $modules[$i]['website'] = 'https://www.allpay.com.tw';
+    $modules[$i]['website'] = 'https://www.opay.tw';
 
     /* 版本號 */
     $modules[$i]['version'] = 'V1.0.0914';
@@ -80,7 +80,7 @@ class ecshop_allpay_atm extends AllInOne {
     function get_code($order, $payment) {
         $isTestMode = ($payment['ecshop_allpay_atm_test_mode'] == 'Yes');
 
-        $this->ServiceURL = ($isTestMode ? "https://payment-stage.allpay.com.tw/Cashier/AioCheckOut" : "https://payment.allpay.com.tw/Cashier/AioCheckOut");
+        $this->ServiceURL = ($isTestMode ? "https://payment-stage.opay.tw/Cashier/AioCheckOut" : "https://payment.opay.tw/Cashier/AioCheckOut");
         $this->HashKey = trim($payment['ecshop_allpay_atm_key']);
         $this->HashIV = trim($payment['ecshop_allpay_atm_iv']);
         $this->MerchantID = trim($payment['ecshop_allpay_atm_account']);
@@ -133,7 +133,7 @@ class ecshop_allpay_atm extends AllInOne {
 
             if (sizeof($arFeedback) > 0) {
                 // 查詢付款結果資料。
-                $this->ServiceURL = ($isTestMode ? "https://payment-stage.allpay.com.tw/Cashier/QueryTradeInfo/V4" : "https://payment.allpay.com.tw/Cashier/QueryTradeInfo/V4");
+                $this->ServiceURL = ($isTestMode ? "https://payment-stage.opay.tw/Cashier/QueryTradeInfo/V4" : "https://payment.opay.tw/Cashier/QueryTradeInfo/V4");
                 $this->MerchantID = trim($arPayment['ecshop_allpay_atm_account']);
                 $this->Query['MerchantTradeNo'] = $arFeedback['MerchantTradeNo'];
 
