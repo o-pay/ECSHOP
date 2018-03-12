@@ -37,7 +37,7 @@ if (isset($set_modules) && $set_modules == TRUE) {
     $modules[$i]['website'] = 'https://www.opay.tw';
 
     /* 版本號 */
-    $modules[$i]['version'] = 'V1.0.0914';
+    $modules[$i]['version'] = 'V1.2.0131';
 
     /* 配置信息 */
     $modules[$i]['config'] = array(
@@ -92,7 +92,7 @@ class ecshop_allpay_card24 extends AllInOne {
         $this->Send['MerchantTradeNo'] = $order['order_sn'];
         $this->Send['MerchantTradeDate'] = date('Y/m/d H:i:s');
         $this->Send['TotalAmount'] = (int)$order['order_amount'];
-        $this->Send['TradeDesc'] = "allpay_module_ecshop_1.0.0914";
+        $this->Send['TradeDesc'] = "allpay_module_ecshop_1.2.0131";
         $this->Send['ChoosePayment'] = PaymentMethod::Credit;
         $this->Send['Remark'] = '';
         $this->Send['ChooseSubPayment'] = PaymentMethodItem::None;

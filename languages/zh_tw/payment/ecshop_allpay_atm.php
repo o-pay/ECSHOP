@@ -3,16 +3,16 @@
 
 global $_LANG;
 
-$_LANG['ecshop_allpay_atm'] = '<font color=blue>歐付寶 ALLPAY ATM</font>';
-$_LANG['ecshop_allpay_atm_desc'] = ' 歐付寶 ALLPAY - <font color=red> ATM</font>';
+$_LANG['ecshop_allpay_atm'] = '<font color=blue>歐付寶 ATM</font>';
+$_LANG['ecshop_allpay_atm_desc'] = ' 歐付寶 - <font color=red> ATM</font>';
 $_LANG['ecshop_allpay_atm_test_mode'] = '測試模式？';
 $_LANG['ecshop_allpay_atm_test_mode_range']['Yes'] = '是';
 $_LANG['ecshop_allpay_atm_test_mode_range']['No'] = '否';
 $_LANG['ecshop_allpay_atm_account'] = '商店代號(必填)';
-$_LANG['ecshop_allpay_atm_iv'] = '歐付寶 ALLPAY IV(必填)';
-$_LANG['ecshop_allpay_atm_key'] = '歐付寶 ALLPAY KEY(必填)';
+$_LANG['ecshop_allpay_atm_iv'] = '歐付寶 IV(必填)';
+$_LANG['ecshop_allpay_atm_key'] = '歐付寶 KEY(必填)';
 
-$_LANG['pay_button'] = '歐付寶 ALLPAY ATM付款';
+$_LANG['pay_button'] = '歐付寶 ATM付款';
 
 $_LANG['text_goods'] = '網路商品一批';
 $_LANG['text_currency'] = '元';

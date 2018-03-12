@@ -3,7 +3,7 @@ if (!defined('IN_ECS')) {
     die('Hacking attempt');
 }
 
-$payment_lang = ROOT_PATH . 'languages/' . $GLOBALS['_CFG']['lang'] . '/payment/ecshop_allpay_tenpay.php';
+$payment_lang = ROOT_PATH . 'languages/' . $GLOBALS['_CFG']['lang'] . '/payment/ecshop_allpay_cvs.php';
 
 if (file_exists($payment_lang)) {
     global $_LANG;
@@ -19,7 +19,7 @@ if (isset($set_modules) && $set_modules == TRUE) {
     $modules[$i]['code'] = basename(__FILE__, '.php');
 
     /* 描述對應的語言項 */
-    $modules[$i]['desc'] = 'ecshop_allpay_tenpay_desc';
+    $modules[$i]['desc'] = 'ecshop_allpay_cvs_desc';
 
     /* 是否支持貨到付款 */
     $modules[$i]['is_cod'] = '0';
@@ -37,14 +37,14 @@ if (isset($set_modules) && $set_modules == TRUE) {
     $modules[$i]['website'] = 'https://www.opay.tw';
 
     /* 版本號 */
-    $modules[$i]['version'] = 'V1.0.0914';
+    $modules[$i]['version'] = 'V1.2.0131';
 
     /* 配置信息 */
     $modules[$i]['config'] = array(
-        array('name' => 'ecshop_allpay_tenpay_test_mode', 'type' => 'select', 'value' => 'Yes'),
-        array('name' => 'ecshop_allpay_tenpay_account', 'type' => 'text', 'value' => '2000132'),
-        array('name' => 'ecshop_allpay_tenpay_iv', 'type' => 'text', 'value' => 'v77hoKGq4kWxNNIS'),
-        array('name' => 'ecshop_allpay_tenpay_key', 'type' => 'text', 'value' => '5294y06JbISpM5x9')
+        array('name' => 'ecshop_allpay_cvs_test_mode', 'type' => 'select', 'value' => 'Yes'),
+        array('name' => 'ecshop_allpay_cvs_account', 'type' => 'text', 'value' => '2000132'),
+        array('name' => 'ecshop_allpay_cvs_iv', 'type' => 'text', 'value' => 'v77hoKGq4kWxNNIS'),
+        array('name' => 'ecshop_allpay_cvs_key', 'type' => 'text', 'value' => '5294y06JbISpM5x9')
     );
     return;
 }
@@ -54,7 +54,7 @@ include_once(ROOT_PATH . '/includes/modules/AllPay.Payment.Integration.php');
 /**
  * 類
  */
-class ecshop_allpay_tenpay extends AllInOne {
+class ecshop_allpay_cvs extends AllInOne {
 
     /**
      * 構造函數
@@ -66,10 +66,10 @@ class ecshop_allpay_tenpay extends AllInOne {
      */
     function __construct() {
         parent::__construct();
-        $this->ecshop_allpay_tenpay();
+        $this->ecshop_allpay_cvs();
     }
 
-    function ecshop_allpay_tenpay() {
+    function ecshop_allpay_cvs() {
         
     }
 
@@ -77,30 +77,34 @@ class ecshop_allpay_tenpay extends AllInOne {
      * 提交函數
      */
     function get_code($order, $payment) {
-        $isTestMode = ($payment['ecshop_allpay_tenpay_test_mode'] == 'Yes');
+        $isTestMode = ($payment['ecshop_allpay_cvs_test_mode'] == 'Yes');
 
         $this->ServiceURL = ($isTestMode ? "https://payment-stage.opay.tw/Cashier/AioCheckOut" : "https://payment.opay.tw/Cashier/AioCheckOut");
-        $this->HashKey = trim($payment['ecshop_allpay_tenpay_key']);
-        $this->HashIV = trim($payment['ecshop_allpay_tenpay_iv']);
-        $this->MerchantID = trim($payment['ecshop_allpay_tenpay_account']);
+        $this->HashKey = trim($payment['ecshop_allpay_cvs_key']);
+        $this->HashIV = trim($payment['ecshop_allpay_cvs_iv']);
+        $this->MerchantID = trim($payment['ecshop_allpay_cvs_account']);
         
-        $szRetUrl = return_url(basename(__FILE__, '.php')) . "&log_id=" . $order['log_id'] . "&order_id=" . $order['order_id'];
+		$szRetUrl = return_url(basename(__FILE__, '.php')) . "&log_id=" . $order['log_id'] . "&order_id=" . $order['order_id'];
         $szRetUrl = str_ireplace('/mobile/', '/', $szRetUrl);
         
         $this->Send['ReturnURL'] = $szRetUrl;
         $this->Send['ClientBackURL'] = $GLOBALS['ecs']->url() . '/user.php?act=order_detail&order_id=' . $order['order_id'];
         $this->Send['MerchantTradeNo'] = $order['order_sn'];
         $this->Send['MerchantTradeDate'] = date('Y/m/d H:i:s');
-        $this->Send['TotalAmount'] = (int)$order['order_amount'];
-        $this->Send['TradeDesc'] = "allpay_module_ecshop_1.0.0914";
-        $this->Send['ChoosePayment'] = PaymentMethod::Tenpay;
+        $this->Send['TotalAmount'] = round($order['order_amount']);
+        $this->Send['TradeDesc'] = "allpay_module_ecshop_1.2.0131";
+        $this->Send['ChoosePayment'] = PaymentMethod::CVS;
         $this->Send['Remark'] = '';
         $this->Send['ChooseSubPayment'] = PaymentMethodItem::None;
         $this->Send['NeedExtraPaidInfo'] = ExtraPaymentInfo::No;
+                        
+        array_push($this->Send['Items'], array('Name' => $GLOBALS['_LANG']['text_goods'], 'Price' => round($order['order_amount']), 'Currency' => $GLOBALS['_LANG']['text_currency'], 'Quantity' => 1, 'URL' => ''));
         
-        array_push($this->Send['Items'], array('Name' => $GLOBALS['_LANG']['text_goods'], 'Price' => intval($order['order_amount']), 'Currency' => $GLOBALS['_LANG']['text_currency'], 'Quantity' => 1, 'URL' => ''));
-
-        $this->SendExtend['ExpireTime'] = date("Y/m/d H:i:s", mktime(date("H"), date("i"), date("s"), date("m"), date("d") + 3, date("Y")));
+        $this->SendExtend['Desc_1'] = '';
+        $this->SendExtend['Desc_2'] = '';
+        $this->SendExtend['Desc_3'] = '';
+        $this->SendExtend['Desc_4'] = '';
+        $this->SendExtend['PaymentInfoURL'] = $szRetUrl . '&pi=true';
         
         return $this->CheckOutString($GLOBALS['_LANG']['pay_button']);
     }
@@ -109,34 +113,57 @@ class ecshop_allpay_tenpay extends AllInOne {
      * 處理函數
      */
     function respond() {
-        $arPayment = get_payment('ecshop_allpay_tenpay');
-        $isTestMode = ($arPayment['ecshop_allpay_tenpay_test_mode'] == 'Yes');
+        $arPayment = get_payment('ecshop_allpay_cvs');
+        $isTestMode = ($arPayment['ecshop_allpay_cvs_test_mode'] == 'Yes');
 
         $arFeedback = null;
         $arQueryFeedback = null;
         $szLogID = $_GET['log_id'];
 		$szOrderID = $_GET['order_id'];
+        //$isPaymentInfo = ($_GET['pi'] == 'true');
 
-        $this->HashKey = trim($arPayment['ecshop_allpay_tenpay_key']);
-        $this->HashIV = trim($arPayment['ecshop_allpay_tenpay_iv']);
+        $this->HashKey = trim($arPayment['ecshop_allpay_cvs_key']);
+        $this->HashIV = trim($arPayment['ecshop_allpay_cvs_iv']);
 
         try {
             // 取得回傳的付款結果。
-            $arFeedback = $this->CheckOutFeedback();
+			$arFeedback = $this->CheckOutFeedback();
 
             if (sizeof($arFeedback) > 0) {
                 // 查詢付款結果資料。
                 $this->ServiceURL = ($isTestMode ? "https://payment-stage.opay.tw/Cashier/QueryTradeInfo/V4" : "https://payment.opay.tw/Cashier/QueryTradeInfo/V4");
-                $this->MerchantID = trim($arPayment['ecshop_allpay_tenpay_account']);
+                $this->MerchantID = trim($arPayment['ecshop_allpay_cvs_account']);
                 $this->Query['MerchantTradeNo'] = $arFeedback['MerchantTradeNo'];
 
                 $arQueryFeedback = $this->QueryTradeInfo();
-
                 if (sizeof($arQueryFeedback) > 0) {
 					$arOrder = order_info($szOrderID);
                     // 檢查支付金額與訂單是否相符。
                     if (round($arOrder['order_amount']) == $arFeedback['TradeAmt'] && $arQueryFeedback['TradeAmt'] == $arFeedback['TradeAmt']) {
                         $szCheckAmount = '1';
+                    }
+                    // 確認產生超商代碼。
+                    if ($arFeedback['RtnCode'] == '10100073' && $szCheckAmount == '1' && $arQueryFeedback["TradeStatus"] == '0') {
+                        $szPaymentType = $arFeedback['PaymentType'];
+                        $szTradeDate = $arFeedback['TradeDate'];
+                        $szBankCode = $arFeedback['PaymentNo'];
+                        $szExpireDate = $arFeedback['ExpireDate'];
+                        $szBarcode1 = $arFeedback['Barcode1'];
+                        $szBarcode2 = $arFeedback['Barcode2'];
+                        $szBarcode3 = $arFeedback['Barcode3'];
+                        
+                        $szNote = sprintf($GLOBALS['_LANG']['text_paying'], date("Y-m-d H:i:s"),
+                                    $szPaymentType, $szTradeDate, $szBankCode, $szExpireDate, $szBarcode1, $szBarcode2, $szBarcode3);
+
+						// 變更訂單狀態為已確認
+						update_order($szOrderID, array('order_status' => OS_CONFIRMED, 'confirm_time' => gmtime()));
+						
+						// 將付款資訊記入操作訊息
+						order_action($arOrder['order_sn'], OS_CONFIRMED, $arOrder['shipping_status'], $arOrder['pay_status'], $szNote);
+                        
+                        ob_get_clean();
+                        print '1|OK';
+                        exit;
                     }
                     // 確認付款結果。
                     if ($arFeedback['RtnCode'] == '1' && $szCheckAmount == '1' && $arQueryFeedback["TradeStatus"] == '1') {
